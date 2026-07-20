@@ -18,6 +18,7 @@ class PRSTDecoder:
     PRODUCT_ID = b'2-PG'  # 'GP-2' reversed
     PARM_MARKER = b'MRAP'  # 'PARM' reversed
     FILE_SIZE = 0x498  # 1176 bytes standard size
+    FILE_LONG_SIZE = 0x4C8 # 1224 bytes long size
 
     def __init__(self, filepath: str):
         self.filepath = Path(filepath)
@@ -25,14 +26,17 @@ class PRSTDecoder:
 
     def decode(self) -> Dict[str, Any]:
         """Decode the entire .prst file"""
-        if len(self.data) < self.FILE_SIZE:
-            raise ValueError(f"File too small: {len(self.data)} bytes, expected {self.FILE_SIZE}")
+        if len(self.data) != self.FILE_SIZE and len(self.data) != self.FILE_LONG_SIZE:
+            raise ValueError(f"File size incorrect: {len(self.data)} bytes, expected {self.FILE_SIZE} or {self.FILE_LONG_SIZE}")
+
+        print(len(self.data))
 
         result = {
-            "format": "GP-200 PRST v2",
             "header": self._decode_header(),
             "metadata": self._decode_metadata(),
             "name": self._decode_name(),
+            "author": self._decode_author(),
+            "note": self._decode_note(),
             "chain": self._decode_chain(),
             "modules": self._decode_modules(),
             "controls": self._decode_controls(),
@@ -49,9 +53,22 @@ class PRSTDecoder:
         """Read 16-bit unsigned little-endian integer"""
         return struct.unpack('<H', self.data[offset:offset+2])[0]
 
+    def _read_u8(self, offset: int) -> int:
+        """Read 8-bit unsigned integer"""
+        return self.data[offset]
+
     def _read_float(self, offset: int) -> float:
         """Read 32-bit IEEE-754 float"""
         return struct.unpack('<f', self.data[offset:offset+4])[0]
+
+    @staticmethod
+    def _decode_ascii(str_bytes: bytes) -> str:
+        """Read ASCII-encoded string"""
+        # Find null terminator
+        null_pos = str_bytes.find(b'\x00')
+        if null_pos >= 0:
+            str_bytes = str_bytes[:null_pos]
+        return str_bytes.decode('ascii', errors='replace').strip()
 
     def _decode_header(self) -> Dict[str, Any]:
         """Decode file header (0x00-0x2F)"""
@@ -75,67 +92,77 @@ class PRSTDecoder:
         }
 
     def _decode_metadata(self) -> Dict[str, Any]:
-        """Decode metadata block (0x30-0x3F)"""
+        """Decode metadata block (0x30-0x43)"""
+        offset = 0x30
+        # Verify header
+        header = self._read_u16(offset)
+        if header != 0x0002:
+            raise ValueError(f"Invalid module header at {offset:#x}: {header:#x}")
+
+        marker = self._read_u16(offset + 2)
+        if marker != 0x0058:
+            raise ValueError(f"Invalid module marker at {offset+2:#x}: {marker:#x}")
+
         # Eight 16-bit values
-        vals = [self._read_u16(0x30 + i*2) for i in range(8)]
+        vals = [self._read_u16(offset + 4 + i*2) for i in range(8)]
 
         return {
-            "constant": vals[0],  # Always 0x0002
-            "bpm": vals[1],       # e.g., 0x58 = 88 BPM
-            "program_index": vals[2],  # Bank/slot position
-            "level": vals[3],     # e.g., 0x78 = 120
-            "param4": vals[4],    # e.g., 0x32 = 50
-            "param5": vals[5],    # Usually 0
-            "ir_or_preset": vals[6],  # Varies: IR or effect chain preset
-            "param7": vals[7]     # Usually 0
+            "program_index": vals[0],  # Bank/slot position
+            "bpm": vals[1],     # e.g., 0x78 = 120
+            "volume": vals[2],    # e.g., 0x32 = 50
+            "pan": vals[3],    # Usually 0
+            "category": vals[4],  # Varies: IR or effect chain preset
+            # FX Loop params
+            "send_level": vals[5],     #
+            "return_level": vals[6],  #
+            "mode": vals[7],  # 0 -> parallel ; 1 -> series
         }
 
     def _decode_name(self) -> str:
-        """Decode patch name (0x40-0x7F)"""
-        # Name starts at 0x44 (skip 4 zero bytes)
-        name_bytes = self.data[0x44:0x80]
-        # Find null terminator
-        null_pos = name_bytes.find(b'\x00')
-        if null_pos >= 0:
-            name_bytes = name_bytes[:null_pos]
-        return name_bytes.decode('ascii', errors='replace').strip()
+        """Decode patch name (0x44-0x53)"""
+        name_bytes = self.data[0x44:0x54]
+        return self._decode_ascii(name_bytes)
+
+    def _decode_author(self) -> str:
+        """Decode patch author (0x54-0x64)"""
+        author_bytes = self.data[0x54:0x64]
+        return self._decode_ascii(author_bytes)
+
+    def _decode_note(self) -> str:
+        """Decode patch note (0x64-0x81)"""
+        note_bytes = self.data[0x64:0x82]
+        return self._decode_ascii(note_bytes)
 
     def _decode_chain(self) -> Dict[str, Any]:
-        """Decode module chain/order (0x80-0x9F)"""
+        """Decode module chain/order (0x82-0x9F)"""
         # Last 2 bytes before chain data are constant: 0x0800 0x1000
         chain_start = 0x90
         chain_bytes = self.data[chain_start:chain_start+16]
 
         return {
             "program_index_repeat": chain_bytes[0],
-            "module_count_info": list(chain_bytes[1:6]),
-            "order": list(chain_bytes[6:])
+            # chain_bytes[1], # Zero byte separator
+            "send_position": chain_bytes[2],
+            "return_position": chain_bytes[3],
+            "order": list(chain_bytes[4:15])
+            # chain_bytes[15] # Zero byte separator
         }
 
     def _decode_modules(self) -> List[Dict[str, Any]]:
         """Decode module blocks - scan for 0x1400 0x4400 markers"""
         modules = []
 
-        # Search for module markers from 0xA0 to 0x3B0 (start of control tables)
-        offset = 0xA0
-        while offset < 0x3B0:
-            # Look for module header
-            if offset + 4 <= len(self.data):
-                header = self._read_u16(offset)
-                marker = self._read_u16(offset + 2)
-
-                if header == 0x0014 and marker == 0x0044:
-                    # Found a module
-                    slot = self.data[offset + 4]
-                    module = self._decode_module(offset, slot)
-                    modules.append(module)
-                    offset += 0x40  # Modules are 0x40 bytes
-                    continue
-
-            offset += 1  # Move to next byte
+        # Search for module markers from 0xA0 to 0x3B7 (start of control tables)
+        base_offset = 0xA0
+        for i in range(11):
+            offset = base_offset + (i * 72)
+            # print(f"Effect Module Offset: {offset:04X}")
+            module = self._decode_module(offset, i)
+            modules.append(module)
+            # print(module)
 
         # Sort by slot number
-        modules.sort(key=lambda m: m['slot'])
+        # modules.sort(key=lambda m: m['slot'])
 
         return modules
 
@@ -159,11 +186,12 @@ class PRSTDecoder:
 
         # Parameters (up to 10 floats starting at offset + 12)
         params = []
-        for i in range(10):
+        for i in range(15):
             param_offset = offset + 12 + (i * 4)
             value = self._read_float(param_offset)
             if value != 0.0 or i < 7:  # Include first 7 even if zero
                 params.append(round(value, 6))
+            # print(f"Effect Module Param Offset: {param_offset:04X}")
 
         return {
             "index": index,
@@ -174,60 +202,79 @@ class PRSTDecoder:
         }
 
     def _decode_controls(self) -> Dict[str, Any]:
-        """Decode control/routing tables (starts ~0x3B0)"""
-        base = 0x3B0
+        """Decode control/routing tables (starts 0x3B8)"""
+        base_offset = 0x3B8
 
-        # Nine 0C00 0C00 records
-        default_controls = []
+        # Nine EXP records each 16 bytes
+        default_exps = []
         for i in range(9):
-            offset = base + (i * 12)
+            offset = base_offset + (i * 16)
             header = self._read_u16(offset)
-            if header != 0x000C:
+            marker = self._read_u16(offset + 2)
+            if header != 0x000C and marker != 0x000C:
                 break
 
-            ctrl_id = self._read_u16(offset + 4)
-            value = self._read_float(offset + 8)
-            default_controls.append({
-                "id": ctrl_id,
-                "value": round(value, 2)
+            exp_id = (self._read_u8(offset + 4) >> 4) & 0x0F
+            exp_param_id = self._read_u8(offset + 4) & 0x0F
+
+            default_exps.append({
+                "id": exp_id,
+                "param": exp_param_id,
+                "module": self._read_u8(offset + 5),
+                "parameter": self._read_u8(offset + 6),
+                "max_value": self._read_float(offset + 8),
+                "min_value": self._read_float(offset + 12),
             })
 
-        # Three 1000 0400 records (footswitch/expression assignments?)
-        assignments_base = base + (9 * 12)
-        assignments = []
+            # print(default_exps)
+
+        # Three Knob records each 8 bytes
+        knobs_base = base_offset + (9 * 16)
+        knobs = []
         for i in range(3):
-            offset = assignments_base + (i * 8)
+            offset = knobs_base + (i * 8)
             header = self._read_u16(offset)
-            if header != 0x0010:
+            marker = self._read_u16(offset + 2)
+            if header != 0x0010 and marker != 0x0004:
                 break
 
-            target = self._read_u16(offset + 4)
-            state = self._read_u16(offset + 6)
-            assignments.append({
-                "target": target,
-                "state": state
+            id = self._read_u8(offset + 4)
+            module = self._read_u8(offset + 5)
+            param_id = self._read_u8(offset + 6)
+            knobs.append({
+                "id": id,
+                "module": module,
+                "param_id": param_id,
             })
 
-        # Four 0F00 0800 records (toggle states?)
-        toggles_base = assignments_base + (3 * 8)
-        toggles = []
-        for i in range(4):
-            offset = toggles_base + (i * 8)
+        # Four or Eight Ctrl records each 12 bytes
+        ctrls_base = knobs_base + (3 * 8)
+        ctrls = []
+        num_ctrls = 4 if len(self.data) == self.FILE_SIZE else 8
+        # print("Num of controls: ", num_ctrls)
+
+        for i in range(num_ctrls):
+            offset = ctrls_base + (i * 12)
             header = self._read_u16(offset)
-            if header != 0x000F:
+            marker = self._read_u16(offset + 2)
+            if header != 0x000F and marker != 0x0008:
                 break
 
-            toggle_id = self._read_u16(offset + 4)
-            value = self._read_u32(offset + 6)
-            toggles.append({
-                "id": toggle_id,
-                "value": value
+            ctrl_id = self._read_u8(offset + 4)
+            mode = self._read_u8(offset + 5)
+            assigns = self._read_u16(offset + 8) # Effect slot as bit flag
+            # print(f"Assigns {assigns:03X}")
+
+            ctrls.append({
+                "id": ctrl_id,
+                "mode": mode,
+                "assigns": assigns,
             })
 
         return {
-            "default_controls": default_controls,
-            "assignments": assignments,
-            "toggles": toggles
+            "exps": default_exps,
+            "knobs": knobs,
+            "ctrls": ctrls
         }
 
     def _decode_checksum(self) -> Dict[str, Any]:
