@@ -1,0 +1,222 @@
+{
+  "header": {
+    "magic": "TSRP",
+    "version": 100663296,
+    "product_id": "GP-2",
+    "firmware_version": "00010100",
+    "timestamp": 0,
+    "file_size": 1172
+  },
+  "metadata": {
+    "constant": 2,
+    "constant2": 88,
+    "program_index": 251,
+    "bpm": 120,
+    "volume": 50,
+    "pan": 0,
+    "category": 0,
+    "send_level": 0,
+    "return_level": 0,
+    "mode": 0
+  },
+  "name": "It's GP-200",
+  "author": "",
+  "chain": {
+    "program_index_repeat": 251,
+    "module_count_info": [
+      0,
+      4,
+      4,
+      0,
+      1
+    ],
+    "order": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      0
+    ]
+  },
+  "modules": [
+    {
+      "index": 0,
+      "slot": 0,
+      "enabled": false,
+      "effect_code": 0,
+      "parameters": [
+        20.0,
+        50.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 1,
+      "slot": 1,
+      "enabled": false,
+      "effect_code": 83886081,
+      "parameters": [
+        50.0,
+        50.0,
+        50.0,
+        50.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 2,
+      "slot": 2,
+      "enabled": false,
+      "effect_code": 50331648,
+      "parameters": [
+        40.0,
+        70.0,
+        50.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 3,
+      "slot": 3,
+      "enabled": false,
+      "effect_code": 117440513,
+      "parameters": [
+        30.0,
+        50.0,
+        50.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 4,
+      "slot": 4,
+      "enabled": false,
+      "effect_code": 27,
+      "parameters": [
+        20.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 5,
+      "slot": 5,
+      "enabled": false,
+      "effect_code": 167772160,
+      "parameters": [
+        1.0,
+        50.0,
+        30.0,
+        15.0,
+        60.0,
+        19.0,
+        20001.0
+      ]
+    },
+    {
+      "index": 6,
+      "slot": 6,
+      "enabled": false,
+      "effect_code": 16777269,
+      "parameters": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        50.0,
+        0.0
+      ]
+    },
+    {
+      "index": 7,
+      "slot": 7,
+      "enabled": false,
+      "effect_code": 67108865,
+      "parameters": [
+        50.0,
+        0.5,
+        50.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 8,
+      "slot": 8,
+      "enabled": false,
+      "effect_code": 184549405,
+      "parameters": [
+        20.0,
+        500.0,
+        20.0,
+        61.799999,
+        100.0,
+        50.0,
+        0.0
+      ]
+    },
+    {
+      "index": 9,
+      "slot": 9,
+      "enabled": false,
+      "effect_code": 201326592,
+      "parameters": [
+        30.0,
+        50.0,
+        50.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 10,
+      "slot": 10,
+      "enabled": true,
+      "effect_code": 100663299,
+      "parameters": [
+        100.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "controls": {
+    "default_controls": [],
+    "assignments": [],
+    "toggles": []
+  },
+  "checksum": {
+    "marker": 1216,
+    "value": 3997171712
+  }
+}

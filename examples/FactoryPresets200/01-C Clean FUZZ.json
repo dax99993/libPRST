@@ -1,0 +1,316 @@
+{
+  "header": {
+    "magic": "TSRP",
+    "version": 50331648,
+    "product_id": "GP-2",
+    "firmware_version": "00010100",
+    "timestamp": 1805578016,
+    "file_size": 1124
+  },
+  "metadata": {
+    "program_index": 2,
+    "bpm": 120,
+    "volume": 50,
+    "pan": 0,
+    "category": 7,
+    "fxloop_send_level": 0,
+    "fxloop_return_level": 0,
+    "fxloop_mode": 0,
+    "name": "Clean FUZZ",
+    "author": "",
+    "note": ""
+  },
+  "chain": {
+    "program_index_repeat": 2,
+    "fxloop_send_position": 4,
+    "fxloop_return_position": 4,
+    "order": [
+      4,
+      10,
+      0,
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  "modules": [
+    {
+      "slot": 0,
+      "enabled": false,
+      "effect_code": 11,
+      "parameters": [
+        20.0,
+        50.0,
+        50.0,
+        50.0,
+        50.0,
+        50.0,
+        50.0
+      ]
+    },
+    {
+      "slot": 1,
+      "enabled": false,
+      "effect_code": 83886081,
+      "parameters": [
+        80.0,
+        100.0,
+        100.0,
+        100.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "slot": 2,
+      "enabled": true,
+      "effect_code": 50331686,
+      "parameters": [
+        10.0,
+        50.0,
+        50.0,
+        60.0,
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "slot": 3,
+      "enabled": true,
+      "effect_code": 117440517,
+      "parameters": [
+        25.0,
+        50.0,
+        50.0,
+        65.490196,
+        50.0,
+        67.0,
+        0.0
+      ]
+    },
+    {
+      "slot": 4,
+      "enabled": true,
+      "effect_code": 27,
+      "parameters": [
+        20.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "slot": 5,
+      "enabled": true,
+      "effect_code": 167772178,
+      "parameters": [
+        4.0,
+        70.0,
+        0.0,
+        50.0,
+        72.0,
+        19.0,
+        20001.0
+      ]
+    },
+    {
+      "slot": 6,
+      "enabled": false,
+      "effect_code": 16777269,
+      "parameters": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        50.0,
+        0.0
+      ]
+    },
+    {
+      "slot": 7,
+      "enabled": true,
+      "effect_code": 67108881,
+      "parameters": [
+        100.0,
+        4.0,
+        50.0,
+        50.0,
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "slot": 8,
+      "enabled": false,
+      "effect_code": 184549377,
+      "parameters": [
+        15.0,
+        4.0,
+        15.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "slot": 9,
+      "enabled": true,
+      "effect_code": 201326600,
+      "parameters": [
+        35.0,
+        50.0,
+        50.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "slot": 10,
+      "enabled": true,
+      "effect_code": 100663299,
+      "parameters": [
+        100.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "controls": {
+    "exps": [
+      {
+        "id": 0,
+        "param": 0,
+        "module": 10,
+        "parameter": 0,
+        "max_value": 100.0,
+        "min_value": 0.0
+      },
+      {
+        "id": 0,
+        "param": 1,
+        "module": 255,
+        "parameter": 0,
+        "max_value": 100.0,
+        "min_value": 0.0
+      },
+      {
+        "id": 0,
+        "param": 2,
+        "module": 255,
+        "parameter": 0,
+        "max_value": 100.0,
+        "min_value": 0.0
+      },
+      {
+        "id": 1,
+        "param": 0,
+        "module": 1,
+        "parameter": 3,
+        "max_value": 100.0,
+        "min_value": 0.0
+      },
+      {
+        "id": 1,
+        "param": 1,
+        "module": 255,
+        "parameter": 0,
+        "max_value": 100.0,
+        "min_value": 0.0
+      },
+      {
+        "id": 1,
+        "param": 2,
+        "module": 255,
+        "parameter": 0,
+        "max_value": 100.0,
+        "min_value": 0.0
+      },
+      {
+        "id": 2,
+        "param": 0,
+        "module": 255,
+        "parameter": 0,
+        "max_value": 100.0,
+        "min_value": 0.0
+      },
+      {
+        "id": 2,
+        "param": 1,
+        "module": 255,
+        "parameter": 0,
+        "max_value": 100.0,
+        "min_value": 0.0
+      },
+      {
+        "id": 2,
+        "param": 2,
+        "module": 255,
+        "parameter": 0,
+        "max_value": 100.0,
+        "min_value": 0.0
+      }
+    ],
+    "knobs": [
+      {
+        "id": 0,
+        "module": 0,
+        "param_id": 0
+      },
+      {
+        "id": 1,
+        "module": 2,
+        "param_id": 0
+      },
+      {
+        "id": 2,
+        "module": 11,
+        "param_id": 0
+      }
+    ],
+    "ctrls": [
+      {
+        "id": 0,
+        "mode": 0,
+        "assigns": 257
+      },
+      {
+        "id": 1,
+        "mode": 1,
+        "assigns": 4
+      },
+      {
+        "id": 2,
+        "mode": 1,
+        "assigns": 128
+      },
+      {
+        "id": 3,
+        "mode": 1,
+        "assigns": 512
+      }
+    ]
+  },
+  "checksum": {
+    "marker": 1168,
+    "value": 3745775616
+  }
+}

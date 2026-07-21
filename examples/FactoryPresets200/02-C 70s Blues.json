@@ -1,0 +1,221 @@
+{
+  "header": {
+    "magic": "TSRP",
+    "version": 50331648,
+    "product_id": "GP-2",
+    "firmware_version": "00010100",
+    "timestamp": 1805578016,
+    "file_size": 1124
+  },
+  "metadata": {
+    "constant": 2,
+    "constant2": 88,
+    "program_index": 6,
+    "bpm": 120,
+    "volume": 50,
+    "pan": 0,
+    "category": 8
+  },
+  "name": "70s Blues",
+  "chain": {
+    "program_index_repeat": 6,
+    "module_count_info": [
+      0,
+      4,
+      4,
+      4,
+      10
+    ],
+    "order": [
+      0,
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9,
+      34
+    ]
+  },
+  "modules": [
+    {
+      "index": 0,
+      "slot": 0,
+      "enabled": false,
+      "effect_code": 0,
+      "parameters": [
+        20.0,
+        50.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 1,
+      "slot": 1,
+      "enabled": false,
+      "effect_code": 83886088,
+      "parameters": [
+        70.0,
+        100.0,
+        100.0,
+        100.0,
+        0.009773,
+        1.868734380374144e+25,
+        0.226942,
+        0.0,
+        0.0,
+        1.8687358791721e+25
+      ]
+    },
+    {
+      "index": 2,
+      "slot": 2,
+      "enabled": true,
+      "effect_code": 50331657,
+      "parameters": [
+        50.0,
+        60.0,
+        50.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 3,
+      "slot": 3,
+      "enabled": true,
+      "effect_code": 117440515,
+      "parameters": [
+        30.0,
+        70.0,
+        40.0,
+        50.0,
+        50.0,
+        75.0,
+        0.0
+      ]
+    },
+    {
+      "index": 4,
+      "slot": 4,
+      "enabled": true,
+      "effect_code": 27,
+      "parameters": [
+        20.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 5,
+      "slot": 5,
+      "enabled": true,
+      "effect_code": 167772162,
+      "parameters": [
+        1.0,
+        60.0,
+        30.0,
+        15.0,
+        60.0,
+        80.0,
+        20001.0
+      ]
+    },
+    {
+      "index": 6,
+      "slot": 6,
+      "enabled": false,
+      "effect_code": 16777269,
+      "parameters": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        50.0,
+        0.0
+      ]
+    },
+    {
+      "index": 7,
+      "slot": 7,
+      "enabled": false,
+      "effect_code": 67108866,
+      "parameters": [
+        3.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 8,
+      "slot": 8,
+      "enabled": false,
+      "effect_code": 184549376,
+      "parameters": [
+        20.0,
+        4.0,
+        50.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 9,
+      "slot": 9,
+      "enabled": true,
+      "effect_code": 201326592,
+      "parameters": [
+        30.0,
+        20.0,
+        50.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 10,
+      "slot": 10,
+      "enabled": true,
+      "effect_code": 100663299,
+      "parameters": [
+        100.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "controls": {
+    "default_controls": [],
+    "assignments": [],
+    "toggles": []
+  },
+  "checksum": {
+    "marker": 1168,
+    "value": 3947823104
+  }
+}

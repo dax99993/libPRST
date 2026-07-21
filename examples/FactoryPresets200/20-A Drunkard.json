@@ -1,0 +1,222 @@
+{
+  "header": {
+    "magic": "TSRP",
+    "version": 50331648,
+    "product_id": "GP-2",
+    "firmware_version": "00010100",
+    "timestamp": 1805578016,
+    "file_size": 1124
+  },
+  "metadata": {
+    "constant": 2,
+    "constant2": 88,
+    "program_index": 76,
+    "bpm": 120,
+    "volume": 50,
+    "pan": 0,
+    "category": 5,
+    "send_level": 0,
+    "return_level": 0,
+    "mode": 0
+  },
+  "name": "Drunkard",
+  "author": "",
+  "chain": {
+    "program_index_repeat": 76,
+    "module_count_info": [
+      0,
+      4,
+      4,
+      4,
+      10
+    ],
+    "order": [
+      0,
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9,
+      0
+    ]
+  },
+  "modules": [
+    {
+      "index": 0,
+      "slot": 0,
+      "enabled": false,
+      "effect_code": 0,
+      "parameters": [
+        20.0,
+        50.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 1,
+      "slot": 1,
+      "enabled": false,
+      "effect_code": 83886081,
+      "parameters": [
+        60.0,
+        60.0,
+        100.0,
+        100.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 2,
+      "slot": 2,
+      "enabled": true,
+      "effect_code": 50331648,
+      "parameters": [
+        0.0,
+        57.0,
+        61.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 3,
+      "slot": 3,
+      "enabled": true,
+      "effect_code": 117440565,
+      "parameters": [
+        30.0,
+        65.0,
+        55.0,
+        55.0,
+        60.0,
+        60.0,
+        0.0
+      ]
+    },
+    {
+      "index": 4,
+      "slot": 4,
+      "enabled": true,
+      "effect_code": 27,
+      "parameters": [
+        35.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 5,
+      "slot": 5,
+      "enabled": true,
+      "effect_code": 167772194,
+      "parameters": [
+        1.0,
+        100.0,
+        30.0,
+        15.0,
+        60.0,
+        19.0,
+        20001.0
+      ]
+    },
+    {
+      "index": 6,
+      "slot": 6,
+      "enabled": true,
+      "effect_code": 16777269,
+      "parameters": [
+        0.0,
+        5.0,
+        6.0,
+        3.0,
+        -5.0,
+        48.0,
+        0.0
+      ]
+    },
+    {
+      "index": 7,
+      "slot": 7,
+      "enabled": false,
+      "effect_code": 67108865,
+      "parameters": [
+        50.0,
+        4.0,
+        50.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 8,
+      "slot": 8,
+      "enabled": false,
+      "effect_code": 184549387,
+      "parameters": [
+        20.0,
+        4.0,
+        35.0,
+        1.0,
+        0.0,
+        50.0,
+        0.0
+      ]
+    },
+    {
+      "index": 9,
+      "slot": 9,
+      "enabled": true,
+      "effect_code": 201326596,
+      "parameters": [
+        17.0,
+        65.0,
+        65.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 10,
+      "slot": 10,
+      "enabled": true,
+      "effect_code": 100663299,
+      "parameters": [
+        100.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "controls": {
+    "default_controls": [],
+    "assignments": [],
+    "toggles": []
+  },
+  "checksum": {
+    "marker": 1168,
+    "value": 2957180928
+  }
+}

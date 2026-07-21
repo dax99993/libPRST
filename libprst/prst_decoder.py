@@ -10,10 +10,11 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
+from libprst.models import Preset, Header, Metadata, Chain, EffectModule, Knob, Ctrl, Exp
+
 
 class PRSTDecoder:
     """Decoder for Valeton GP-200 .prst preset files"""
-
     MAGIC = b'TSRP'  # 'PRST' reversed
     PRODUCT_ID = b'2-PG'  # 'GP-2' reversed
     PARM_MARKER = b'MRAP'  # 'PARM' reversed
@@ -31,19 +32,69 @@ class PRSTDecoder:
 
         print(len(self.data))
 
-        result = {
-            "header": self._decode_header(),
-            "metadata": self._decode_metadata(),
-            "name": self._decode_name(),
-            "author": self._decode_author(),
-            "note": self._decode_note(),
-            "chain": self._decode_chain(),
-            "modules": self._decode_modules(),
-            "controls": self._decode_controls(),
-            "checksum": self._decode_checksum()
-        }
+        header_dict = self._decode_header()
+        metadata_dict = self._decode_metadata()
+        chain_dict = self._decode_chain()
+        modules_dict = self._decode_modules()
+        exps_dict = self._decode_exps()
+        knobs_dict = self._decode_knobs()
+        ctrls_dict = self._decode_ctrls()
+        checksum_dict = self._decode_checksum()
 
-        return result
+        # Cast to dataclass
+        # header = Header(**header_dict)
+        # metadata = Metadata(
+        #     program_index=metadata_dict['program_index'],
+        #     name=metadata_dict['name'],
+        #     author=metadata_dict['author'],
+        #     note=metadata_dict['note'],
+        #     category=metadata_dict['category'],
+        #
+        #     bpm=metadata_dict['bpm'],
+        #     volume=metadata_dict['volume'],
+        #     pan=metadata_dict['pan'],
+        #
+        #     fxloop_send_level=metadata_dict['fxloop_send_level'],
+        #     fxloop_return_level=metadata_dict['fxloop_return_level'],
+        #     fxloop_mode=metadata_dict['fxloop_mode'],
+        # )
+        # chain = Chain(
+        #     fxloop_send_position=chain_dict['fxloop_send_position'],
+        #     fxloop_return_position=chain_dict['fxloop_return_position'],
+        #     order=chain_dict['order'],
+        # )
+        # modules = [ EffectModule(**module_dict) for module_dict in modules_dict ]
+        # exps = [ Exp(**exp_dict) for exp_dict in metadata_dict ]
+        # knobs = [ Knob(**knob_dict) for knob_dict in knobs_dict]
+        # ctrls = [Ctrl(**ctrl_dict) for ctrl_dict in ctrls_dict ]
+        # checksum = chain_dict['checksum']
+        #
+        #
+        # preset = Preset(
+        #     header=header,
+        #     metadata=metadata,
+        #     chain=chain,
+        #     modules=modules,
+        #     exps=exps,
+        #     knobs=knobs,
+        #     ctrls=ctrls,
+        #     checksum=checksum,
+        # )
+        #
+        # print(preset)
+        #
+        # return preset
+
+        return {
+            "header": header_dict,
+            "metadata": metadata_dict,
+            "chain": chain_dict,
+            "modules": modules_dict,
+            "exps": exps_dict,
+            "knobs": knobs_dict,
+            "ctrls": ctrls_dict,
+            "checksum": checksum_dict
+        }
 
     def _read_u32(self, offset: int) -> int:
         """Read 32-bit unsigned little-endian integer"""
@@ -77,6 +128,7 @@ class PRSTDecoder:
             raise ValueError(f"Invalid magic: {magic}, expected {self.MAGIC}")
 
         version = self._read_u32(0x08)
+        print(f"Version: {version:08X}")
         product_id = self.data[0x10:0x14][::-1].decode('ascii')  # Reverse bytes
         fw_version = self.data[0x14:0x18].hex()
         timestamp = self._read_u32(0x18)
@@ -106,16 +158,29 @@ class PRSTDecoder:
         # Eight 16-bit values
         vals = [self._read_u16(offset + 4 + i*2) for i in range(8)]
 
+        # 16 character name
+        name = self._decode_name()
+        # 16 character author
+        author = self._decode_author()
+        # 30 character note
+        note = self._decode_note()
+
+        print("Name: ", name)
+        print("Author: ", author)
+        print("Note: ", note)
+
         return {
             "program_index": vals[0],  # Bank/slot position
             "bpm": vals[1],     # e.g., 0x78 = 120
             "volume": vals[2],    # e.g., 0x32 = 50
             "pan": vals[3],    # Usually 0
-            "category": vals[4],  # Varies: IR or effect chain preset
-            # FX Loop params
-            "send_level": vals[5],     #
-            "return_level": vals[6],  #
-            "mode": vals[7],  # 0 -> parallel ; 1 -> series
+            "category": vals[4],  # category encoded as int
+            "fxloop_send_level": vals[5], #
+            "fxloop_return_level": vals[6],  #
+            "fxloop_mode": vals[7],  # 0 -> parallel ; 1 -> series
+            "name": name,
+            "author": author,
+            "note": note,
         }
 
     def _decode_name(self) -> str:
@@ -124,7 +189,7 @@ class PRSTDecoder:
         return self._decode_ascii(name_bytes)
 
     def _decode_author(self) -> str:
-        """Decode patch author (0x54-0x64)"""
+        """Decode patch author (0x54-0x63)"""
         author_bytes = self.data[0x54:0x64]
         return self._decode_ascii(author_bytes)
 
@@ -142,8 +207,8 @@ class PRSTDecoder:
         return {
             "program_index_repeat": chain_bytes[0],
             # chain_bytes[1], # Zero byte separator
-            "send_position": chain_bytes[2],
-            "return_position": chain_bytes[3],
+            "fxloop_send_position": chain_bytes[2],
+            "fxloop_return_position": chain_bytes[3],
             "order": list(chain_bytes[4:15])
             # chain_bytes[15] # Zero byte separator
         }
@@ -159,7 +224,6 @@ class PRSTDecoder:
             # print(f"Effect Module Offset: {offset:04X}")
             module = self._decode_module(offset, i)
             modules.append(module)
-            # print(module)
 
         # Sort by slot number
         # modules.sort(key=lambda m: m['slot'])
@@ -189,24 +253,22 @@ class PRSTDecoder:
         for i in range(15):
             param_offset = offset + 12 + (i * 4)
             value = self._read_float(param_offset)
-            if value != 0.0 or i < 7:  # Include first 7 even if zero
-                params.append(round(value, 6))
-            # print(f"Effect Module Param Offset: {param_offset:04X}")
+            params.append(value)
 
         return {
-            "index": index,
+            # "index": index,
             "slot": slot,
             "enabled": bool(enabled),
-            "effect_code": effect_code,
+            "id": effect_code,
             "parameters": params
         }
 
-    def _decode_controls(self) -> Dict[str, Any]:
-        """Decode control/routing tables (starts 0x3B8)"""
+    def _decode_exps(self) -> List[Dict[str, Any]]:
+        """Decode EXP (starts 0x3B8)"""
         base_offset = 0x3B8
 
         # Nine EXP records each 16 bytes
-        default_exps = []
+        exps = []
         for i in range(9):
             offset = base_offset + (i * 16)
             header = self._read_u16(offset)
@@ -217,22 +279,25 @@ class PRSTDecoder:
             exp_id = (self._read_u8(offset + 4) >> 4) & 0x0F
             exp_param_id = self._read_u8(offset + 4) & 0x0F
 
-            default_exps.append({
+            exps.append({
                 "id": exp_id,
-                "param": exp_param_id,
-                "module": self._read_u8(offset + 5),
-                "parameter": self._read_u8(offset + 6),
+                "parameter_id": exp_param_id,
+                "module_id": self._read_u8(offset + 5),
+                "module_parameter_id": self._read_u8(offset + 6),
                 "max_value": self._read_float(offset + 8),
                 "min_value": self._read_float(offset + 12),
             })
 
             # print(default_exps)
+        return exps
 
+    def _decode_knobs(self) -> List[Dict[str, Any]]:
+        """Decode Knobs (starts 0x448)"""
         # Three Knob records each 8 bytes
-        knobs_base = base_offset + (9 * 16)
+        base_offset = 0x448
         knobs = []
         for i in range(3):
-            offset = knobs_base + (i * 8)
+            offset = base_offset + (i * 8)
             header = self._read_u16(offset)
             marker = self._read_u16(offset + 2)
             if header != 0x0010 and marker != 0x0004:
@@ -243,18 +308,22 @@ class PRSTDecoder:
             param_id = self._read_u8(offset + 6)
             knobs.append({
                 "id": id,
-                "module": module,
-                "param_id": param_id,
+                "module_id": module,
+                "parameter_id": param_id,
             })
 
+        return knobs
+
+    def _decode_ctrls(self) -> List[Dict[str, Any]]:
+        """Decode Ctrls (starts 0x460)"""
         # Four or Eight Ctrl records each 12 bytes
-        ctrls_base = knobs_base + (3 * 8)
+        base_offset = 0x460
         ctrls = []
         num_ctrls = 4 if len(self.data) == self.FILE_SIZE else 8
         # print("Num of controls: ", num_ctrls)
 
         for i in range(num_ctrls):
-            offset = ctrls_base + (i * 12)
+            offset = base_offset + (i * 12)
             header = self._read_u16(offset)
             marker = self._read_u16(offset + 2)
             if header != 0x000F and marker != 0x0008:
@@ -262,20 +331,16 @@ class PRSTDecoder:
 
             ctrl_id = self._read_u8(offset + 4)
             mode = self._read_u8(offset + 5)
-            assigns = self._read_u16(offset + 8) # Effect slot as bit flag
+            binds = self._read_u16(offset + 8) # Effect slot as bit flag
             # print(f"Assigns {assigns:03X}")
 
             ctrls.append({
                 "id": ctrl_id,
                 "mode": mode,
-                "assigns": assigns,
+                "binds": binds,
             })
 
-        return {
-            "exps": default_exps,
-            "knobs": knobs,
-            "ctrls": ctrls
-        }
+        return ctrls
 
     def _decode_checksum(self) -> Dict[str, Any]:
         """Decode checksum/trailer"""
@@ -314,7 +379,7 @@ def main():
 
         print(f"✓ Decoded: {input_path}")
         print(f"  → {output_path}")
-        print(f"  Preset: {result['name']}")
+        print(f"  Preset: {result['metadata']['name']}")
         print(f"  BPM: {result['metadata']['bpm']}")
         print(f"  Modules: {len([m for m in result['modules'] if m['enabled']])} enabled")
 
