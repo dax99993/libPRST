@@ -1,5 +1,4 @@
-from libprst.models import Header
-from libprst.prst_decoder import PRSTDecoder
+from libprst.decoder import PRSTDecoder
 import os
 
 def test_decoder_header_long(pytestconfig):

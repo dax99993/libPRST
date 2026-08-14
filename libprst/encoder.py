@@ -4,10 +4,9 @@ Valeton GP-200 PRST File Encoder
 Converts JSON format back to binary .prst files
 """
 
-import json
 import struct
-import sys
-from pathlib import Path
+import time
+import math
 from typing import Any, Dict
 
 
@@ -80,14 +79,14 @@ class PRSTEncoder:
         fw_hex = header.get('firmware_version', '00010100')
         self.buffer[0x14:0x18] = bytes.fromhex(fw_hex)
 
+        # zero dword
+        self._write_u32(0x18, 0)
         # Timestamp
-        # self._write_u32(0x18, header.get('timestamp', 0x6b9eef20))
-        self._write_u32(0x18, header.get('timestamp', 0))
 
         # Constant dword
-        # self._write_u32(0x1C, 1)
-        # self._write_u32(0x1C, 0xd8ed6f02)
-        self._write_u32(0x1C, 0x026fedd8)
+        # self._write_u32(0x1C, 1) # in old format
+        self._write_u32(0x1C, header.get('timestamp', math.floor(time.time())))
+        # self._write_u32(0x1C, 0x026fedd8)
 
         # File structure markers
         self._write_u32(0x20, 0x28)
@@ -271,48 +270,17 @@ class PRSTEncoder:
 
     def _encode_checksum(self):
         """Encode checksum/trailer"""
-        offset = len(self.buffer) - 8
-        print(offset, offset + 6)
-        self._write_u16(offset, offset)
-        self._write_u16_big(offset + 6, sum(self.buffer) & 0xFFFF)
+        # Add info size at mark
+        info_offset = len(self.buffer) - 8
+        print(f"Info size offset: {info_offset:04X}")
 
+        self._write_u16(info_offset, info_offset)
+        # Add checksum
 
-def main():
-    if len(sys.argv) < 2:
-        print("Usage: prst_encoder.py <input.json> [output.prst]")
-        print("  If output.prst is not specified, uses <input>.prst")
-        sys.exit(1)
+        checksum_offset = len(self.buffer) - 2
+        print("Checksum positions: ", checksum_offset, checksum_offset + 2)
 
-    input_path = sys.argv[1]
-
-    # Determine output path
-    if len(sys.argv) >= 3:
-        output_path = sys.argv[2]
-    else:
-        output_path = Path(input_path).with_suffix('.prst')
-
-    try:
-        # Load JSON
-        with open(input_path, 'r') as f:
-            data = json.load(f)
-
-        # Encode
-        encoder = PRSTEncoder(data)
-        binary_data = encoder.encode()
-
-        # Write binary file
-        with open(output_path, 'wb') as f:
-            f.write(binary_data)
-
-        print(f"✓ Encoded: {input_path}")
-        print(f"  → {output_path}")
-        print(f"  Preset: {data.get('name', 'Untitled')}")
-        print(f"  Size: {len(binary_data)} bytes")
-
-    except Exception as e:
-        print(f"✗ Error encoding {input_path}: {e}", file=sys.stderr)
-        sys.exit(1)
-
-
-if __name__ == '__main__':
-    main()
+        # buffer has zeroes where checksum should be so we can safely sum all the array
+        s = sum(self.buffer) & 0xFFFF
+        print(f"Checksum: {s:04X}")
+        self._write_u16_big(checksum_offset, s)

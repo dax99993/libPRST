@@ -18,12 +18,12 @@ The GP-200 uses binary .prst files to store presets. These scripts convert betwe
 Convert a single .prst file to JSON:
 
 ```bash
-python3 libprst/prst_decoder.py <input.prst> [output.json]
+python3 libprst/decoder.py <input.prst> [output.json]
 ```
 
 Example:
 ```bash
-python3 libprst/prst_decoder.py "examples/FactoryPresets200/01-B 50s Plexi.prst"
+python3 libprst/decoder.py "examples/FactoryPresets200/01-B 50s Plexi.prst"
 # Creates: examples/FactoryPresets200/01-B 50s Plexi.json
 ```
 
@@ -37,12 +37,12 @@ libprst/batch_decode.sh examples/FactoryPresets200/
 Convert a JSON file back to .prst binary:
 
 ```bash
-python3 libprst/prst_encoder.py <input.json> [output.prst]
+python3 libprst/encoder.py <input.json> [output.prst]
 ```
 
 Example:
 ```bash
-python3 libprst/prst_encoder.py "examples/FactoryPresets200/01-B 50s Plexi.json" "my_preset.prst"
+python3 libprst/encoder.py "examples/FactoryPresets200/01-B 50s Plexi.json" "my_preset.prst"
 ```
 
 ## JSON Format
